@@ -1,3 +1,7 @@
+
+import java.util.ArrayList;
+import java.util.Collections;
+
 public abstract class Conta implements ITaxas{
 
     private int numero;
@@ -8,7 +12,7 @@ public abstract class Conta implements ITaxas{
 
     protected double limite;
 
-    private Operacao[] operacoes = new Operacao[1000];
+    private ArrayList<Operacao> operacoes;
 
     private int proximaOperacao;
 
@@ -22,33 +26,17 @@ public abstract class Conta implements ITaxas{
         this.saldo = saldo;
         this.limite = limite;
 
-        this.operacoes = new Operacao[10];
+        this.operacoes = new ArrayList<Operacao>();
         this.proximaOperacao = 0;
 
         Conta.totalContas++;
     }
 
-    private void redimensionarVetor() {
-        Operacao[] newArray = new Operacao[this.operacoes.length * 2];
-        for (int i = 0; i < this.operacoes.length; i++) {
-            newArray[i] = this.operacoes[i];
-        }
-        this.operacoes = newArray;
-    }
-
-    private void adicionarOperacao(Operacao operacao) {
-        if(this.proximaOperacao == this.operacoes.length) {
-            redimensionarVetor();
-        }
-        this.operacoes[this.proximaOperacao] = operacao;
-        this.proximaOperacao++;
-    }
 
     public boolean sacar(double valor) {
         if (valor >= 0 && valor <= this.limite) {
             this.saldo -= valor;
-            OperacaoSaque Saque = new OperacaoSaque(valor);
-            operacoes[cont] = Saque;
+            this.operacoes.add (new OperacaoSaque(valor));
             cont++;
             return true;
         }
@@ -58,8 +46,7 @@ public abstract class Conta implements ITaxas{
 
     public void depositar(double valor) {
         this.saldo += valor;
-        OperacaoDeposito Deposito = new OperacaoDeposito(valor);
-        operacoes[cont] = Deposito;
+        this.operacoes.add(new OperacaoDeposito(valor));
         cont++;
     }
 
@@ -78,14 +65,27 @@ public abstract class Conta implements ITaxas{
         return dados;
     }
 
-    public void imprimirExtrato() {
-        System.out.println("======= Extrato Conta: " + this.numero + " ======");
-        for(Operacao atual : this.operacoes) {
-            if (atual != null) {
-                System.out.println (atual.toString());
-            }
-        }
-        System.out.println("====================");
+    public void imprimirExtrato(int flag) {
+     if(flag == 1) {
+         System.out.println("======= Extrato Conta: " + this.numero + " ======");
+         for (Operacao atual : this.operacoes) {
+             if (atual != null) {
+                 System.out.println(atual.toString());
+             }
+         }
+         System.out.println("====================");
+     }else if(flag == 2){
+         Collections.sort(operacoes);
+         System.out.println("======= Extrato Conta : " + this.numero + " (Ordenado) ======");
+         for (Operacao atual : this.operacoes) {
+             if (atual != null) {
+                 System.out.println(atual.toString());
+             }
+         }
+         System.out.println("====================");
+     }else{
+         System.out.println("Forma de ordenação inválida");
+     }
     }
 
     public boolean equals(Object object){
